@@ -2,5 +2,5 @@
     "python.linting.pylintEnabled": false,
     "python.linting.flake8Enabled": true,
     "python.linting.enabled": true,
-    "python.pythonPath": "c:\\Users\\abdul\\Documents\\recipe-app-api\\django-proj\\Scripts\\python.exe"
+    "python.pythonPath": "env\\Scripts\\python.exe"
 }
