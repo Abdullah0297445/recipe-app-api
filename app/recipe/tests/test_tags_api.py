@@ -81,3 +81,46 @@ class PrivateTagsApiTests(TestCase):
         res = self.client.post(TAG_URL, payload)
 
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_retrieve_tags_assigned_to_recipes(self):
+        """Test retrieving tags asasigned to particular recipe"""
+        tag1 = models.Tag.objects.create(user=self.user, name='Tag 1')
+        tag2 = models.Tag.objects.create(user=self.user, name='Tag 2')
+
+        recipe = models.Recipe.objects.create(
+            title='sample recipe',
+            price=3,
+            time=4,
+            user=self.user
+        )
+        recipe.tags.add(tag1)
+
+        res = self.client.get(TAG_URL, {'assigned_only': 1})
+
+        serializer1 = serializers.TagSerializer(tag1)
+        serializer2 = serializers.TagSerializer(tag2)
+        self.assertIn(serializer1.data, res.data)
+        self.assertNotIn(serializer2.data, res.data)
+
+    def test_retrieve_unique_tags(self):
+        """Test that retrieved tags are unique"""
+        tag = models.Tag.objects.create(user=self.user, name='Drink')
+        models.Tag.objects.create(user=self.user, name='tag')
+
+        recipe1 = models.Recipe.objects.create(
+            title='sample recipe',
+            price=2,
+            time=5,
+            user=self.user
+        )
+        recipe2 = models.Recipe.objects.create(
+            title='sample recipe 2',
+            price=2,
+            time=5,
+            user=self.user
+        )
+        recipe1.tags.add(tag)
+        recipe2.tags.add(tag)
+
+        res = self.client.get(TAG_URL, {'assigned_only': 1})
+        self.assertEqual(len(res.data), 1)
